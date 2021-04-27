@@ -62,10 +62,9 @@ expeditions %>%
   select(termination_reason) %>%
   print(n = 100)
 
+members %>%
+  filter(expedition_id == "AMAD61101") 
 
-peaks %>%
-  select(peak_name) %>%
-  print(n = 468)
 
 ```
 ### Answer
@@ -77,7 +76,7 @@ Replace this text with your answer to your question.
 
 ## Question 2
 
-#### Have climbers waited to climb the taller mountains over time?
+#### Are injuries more likely to occur in the upper half or lower half of the peak's height?
 ### Methods
 
 ### Answer
@@ -88,7 +87,7 @@ Replace this text with your answer to your question.
 
 ## Question 3
 
-#### REPLACE TEXT WITH YOUR QUESTION. Your question should literally be a level-4 header.
+#### In which season are climbers most likely to succeed?
 
 ### Methods
 
@@ -101,7 +100,7 @@ Replace this text with your answer to your question.
 
 ## Question 4
 
-#### REPLACE TEXT WITH YOUR QUESTION. Your question should literally be a level-4 header.
+#### What is the minimum average age of a first ascent expedition group?
 
 ### Methods
 
