@@ -1,8 +1,11 @@
 ---
 title: "Final Project"
 subtitle: "Data Science for Biologists, Spring 2021"
-author: "Your name goes here"
-output: html_document
+author: "John McAvaddy"
+output: 
+  html_document:
+    theme: lumen
+    highlight: espresso
 editor_options: 
   chunk_output_type: console
 ---
@@ -12,28 +15,59 @@ editor_options:
 knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo = TRUE, include = TRUE)
 
 # Load all libraries you use HERE:
-load(tidyverse)
+library(tidyverse)
 ```
 
 <br><br>
 
 ## Introduction
 
+I chose [data](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-09-22) recorded on mountain ascents in the [Himalayan mountain range](https://en.wikipedia.org/wiki/Himalayas). I chose this data because if I could get paid to climb mountains, I would climb one every day for the rest of my life. Because of my love for climbing mountains, I thought it would be interesting to explore climbing data collected from some of the [tallest mountains](https://en.wikipedia.org/wiki/List_of_highest_mountains_on_Earth) in the world. 
+
 ```{r read-examine-data}
 members <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-22/members.csv')
 expeditions <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-22/expeditions.csv')
 peaks <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-22/peaks.csv')
 
+glimpse(members) # see data in members data set
+glimpse(expeditions) # see data in expeditions data set
+glimpse(peaks) # see data in peaks data set
 ```
 
 <br><br>
 
 ## Question 1
 
-#### REPLACE TEXT WITH YOUR QUESTION. Your question should literally be a level-4 header.
+#### Is there a relationship between the average age of an expedition group and whether they successfully reached the peak?
 
 ### Methods
+```{r question_one_methods}
+# members %>%
+#   group_by(expedition_id) %>% # groups rows by similar values in 
+#   summarize(average_age = mean(age)) %>% # create new column of average ages of each expedition group
+#   drop_na() %>% # drop NA here so I don't consider any groups that do not have a "complete" average age
+#   left_join(members) %>% # combine average_age column into original data set 
+#   mutate(success = if_else(success == TRUE, 1, 0)) %>%
+#   select(expedition_id, average_age, success) %>%
+#   print()
 
+# members %>%
+#   select(expedition_id) %>%
+#   distinct() %>%
+#   print()
+
+expeditions %>%
+  mutate(termination_reason = str_replace(termination_reason, "Success (main peak) ", "Success")) %>%
+  mutate(termination_reason = str_replace(termination_reason, "Success (subpeak) ", "Success")) %>%
+  select(termination_reason) %>%
+  print(n = 100)
+
+
+peaks %>%
+  select(peak_name) %>%
+  print(n = 468)
+
+```
 ### Answer
 
 Replace this text with your answer to your question.
@@ -43,8 +77,7 @@ Replace this text with your answer to your question.
 
 ## Question 2
 
-#### REPLACE TEXT WITH YOUR QUESTION. Your question should literally be a level-4 header.
-
+#### Have climbers waited to climb the taller mountains over time?
 ### Methods
 
 ### Answer
