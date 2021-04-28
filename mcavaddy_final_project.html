@@ -336,148 +336,67 @@ summary {
 </div>
 <div id="question-1" class="section level2">
 <h2>Question 1</h2>
-<div id="is-there-a-relationship-between-the-average-age-of-an-expedition-group-and-whether-they-successfully-reached-the-peak" class="section level4">
-<h4>Is there a relationship between the average age of an expedition group and whether they successfully reached the peak?</h4>
+<div id="is-there-a-relationship-between-the-average-age-of-an-expedition-group-and-whether-the-group-successfully-reached-a-peak" class="section level4">
+<h4>Is there a relationship between the average age of an expedition group and whether the group successfully reached a peak?</h4>
 </div>
 <div id="methods" class="section level3">
 <h3>Methods</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># members %&gt;%</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(expedition_id) %&gt;% # groups rows by similar values in </span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   summarize(average_age = mean(age)) %&gt;% # create new column of average ages of each expedition group</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   drop_na() %&gt;% # drop NA here so I don&#39;t consider any groups that do not have a &quot;complete&quot; average age</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   left_join(members) %&gt;% # combine average_age column into original data set </span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(success = if_else(success == TRUE, 1, 0)) %&gt;%</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(expedition_id, average_age, success) %&gt;%</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   print()</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># members %&gt;%</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(expedition_id) %&gt;%</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   distinct() %&gt;%</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   print()</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>expeditions <span class="sc">%&gt;%</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">termination_reason =</span> <span class="fu">str_replace</span>(termination_reason, <span class="st">&quot;Success (main peak) &quot;</span>, <span class="st">&quot;Success&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">termination_reason =</span> <span class="fu">str_replace</span>(termination_reason, <span class="st">&quot;Success (subpeak) &quot;</span>, <span class="st">&quot;Success&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(termination_reason) <span class="sc">%&gt;%</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">n =</span> <span class="dv">100</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 10,364 x 1
-##     termination_reason                                                          
-##     &lt;chr&gt;                                                                       
-##   1 Success (main peak)                                                         
-##   2 Success (main peak)                                                         
-##   3 Success (main peak)                                                         
-##   4 Bad weather (storms, high winds)                                            
-##   5 Bad weather (storms, high winds)                                            
-##   6 Accident (death or serious injury)                                          
-##   7 Accident (death or serious injury)                                          
-##   8 Bad weather (storms, high winds)                                            
-##   9 Accident (death or serious injury)                                          
-##  10 Bad weather (storms, high winds)                                            
-##  11 Accident (death or serious injury)                                          
-##  12 Success (main peak)                                                         
-##  13 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  14 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  15 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  16 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  17 Bad weather (storms, high winds)                                            
-##  18 Bad weather (storms, high winds)                                            
-##  19 Bad weather (storms, high winds)                                            
-##  20 Route technically too difficult, lack of experience, strength, or motivation
-##  21 Bad weather (storms, high winds)                                            
-##  22 Bad weather (storms, high winds)                                            
-##  23 Bad weather (storms, high winds)                                            
-##  24 Did not attempt climb                                                       
-##  25 Bad weather (storms, high winds)                                            
-##  26 Success (main peak)                                                         
-##  27 Success (main peak)                                                         
-##  28 Success (main peak)                                                         
-##  29 Success (main peak)                                                         
-##  30 Success (main peak)                                                         
-##  31 Success (main peak)                                                         
-##  32 Success (main peak)                                                         
-##  33 Success (main peak)                                                         
-##  34 Illness, AMS, exhaustion, or frostbite                                      
-##  35 Success (main peak)                                                         
-##  36 Success (main peak)                                                         
-##  37 Bad weather (storms, high winds)                                            
-##  38 Success (main peak)                                                         
-##  39 Success (main peak)                                                         
-##  40 Success (main peak)                                                         
-##  41 Bad weather (storms, high winds)                                            
-##  42 Lack (or loss) of supplies or equipment                                     
-##  43 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  44 Success (main peak)                                                         
-##  45 Success (main peak)                                                         
-##  46 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  47 Bad weather (storms, high winds)                                            
-##  48 Success (main peak)                                                         
-##  49 Success (main peak)                                                         
-##  50 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  51 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  52 Success (main peak)                                                         
-##  53 Bad weather (storms, high winds)                                            
-##  54 Bad weather (storms, high winds)                                            
-##  55 Bad weather (storms, high winds)                                            
-##  56 Bad weather (storms, high winds)                                            
-##  57 Success (main peak)                                                         
-##  58 Success (main peak)                                                         
-##  59 Success (main peak)                                                         
-##  60 Success (main peak)                                                         
-##  61 Bad weather (storms, high winds)                                            
-##  62 Success (main peak)                                                         
-##  63 Bad weather (storms, high winds)                                            
-##  64 Lack of time                                                                
-##  65 Success (main peak)                                                         
-##  66 Bad weather (storms, high winds)                                            
-##  67 Route technically too difficult, lack of experience, strength, or motivation
-##  68 Did not reach base camp                                                     
-##  69 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  70 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  71 Lack of time                                                                
-##  72 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  73 Success (subpeak)                                                           
-##  74 Lack of time                                                                
-##  75 Bad weather (storms, high winds)                                            
-##  76 Lack (or loss) of supplies or equipment                                     
-##  77 Bad weather (storms, high winds)                                            
-##  78 Success (main peak)                                                         
-##  79 Success (main peak)                                                         
-##  80 Success (main peak)                                                         
-##  81 Success (main peak)                                                         
-##  82 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  83 Success (main peak)                                                         
-##  84 Success (main peak)                                                         
-##  85 Bad weather (storms, high winds)                                            
-##  86 Lack (or loss) of supplies or equipment                                     
-##  87 Success (main peak)                                                         
-##  88 Did not reach base camp                                                     
-##  89 Success (main peak)                                                         
-##  90 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  91 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  92 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  93 Success (main peak)                                                         
-##  94 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  95 Other                                                                       
-##  96 Success (main peak)                                                         
-##  97 Success (main peak)                                                         
-##  98 Bad conditions (deep snow, avalanching, falling ice, or rock)               
-##  99 Bad weather (storms, high winds)                                            
-## 100 Bad weather (storms, high winds)                                            
-## # … with 10,264 more rows</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>members <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(expedition_id) <span class="sc">%&gt;%</span> <span class="co"># groups rows by similar values in</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">average_age =</span> <span class="fu">mean</span>(age)) <span class="sc">%&gt;%</span> <span class="co"># create new column of average ages of each expedition group</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span> <span class="co"># drop NA here so I don&#39;t consider any groups that do not have a &quot;complete&quot; average age</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(members) <span class="sc">%&gt;%</span> <span class="co"># combine average_age column into original data set</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">success =</span> <span class="fu">if_else</span>(success <span class="sc">==</span> <span class="cn">TRUE</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span> <span class="co"># change success column from logic to dbl for maths</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(expedition_id, average_age, success) <span class="sc">%&gt;%</span> <span class="co"># I only want to see these columns</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 60,754 x 3
+##    expedition_id average_age success
+##    &lt;chr&gt;               &lt;dbl&gt;   &lt;dbl&gt;
+##  1 ACHN15301            22.4       1
+##  2 ACHN15301            22.4       1
+##  3 ACHN15301            22.4       1
+##  4 ACHN15301            22.4       1
+##  5 ACHN15301            22.4       1
+##  6 ACHN15302            49.1       1
+##  7 ACHN15302            49.1       0
+##  8 ACHN15302            49.1       0
+##  9 ACHN15302            49.1       1
+## 10 ACHN15302            49.1       0
+## # … with 60,744 more rows</code></pre>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>members <span class="sc">%&gt;%</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(expedition_id <span class="sc">==</span> <span class="st">&quot;AMAD61101&quot;</span>) </span></code></pre></div>
-<pre><code>## # A tibble: 5 x 21
-##   expedition_id member_id peak_id peak_name  year season sex     age citizenship
-##   &lt;chr&gt;         &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;      
-## 1 AMAD61101     AMAD6110… AMAD    Ama Dabl…  1961 Spring M        41 New Zealand
-## 2 AMAD61101     AMAD6110… AMAD    Ama Dabl…  1961 Spring M        23 New Zealand
-## 3 AMAD61101     AMAD6110… AMAD    Ama Dabl…  1961 Spring M        35 UK         
-## 4 AMAD61101     AMAD6110… AMAD    Ama Dabl…  1961 Spring M        29 USA        
-## 5 AMAD61101     AMAD6110… AMAD    Ama Dabl…  1961 Spring M        29 New Zealand
-## # … with 12 more variables: expedition_role &lt;chr&gt;, hired &lt;lgl&gt;,
-## #   highpoint_metres &lt;dbl&gt;, success &lt;lgl&gt;, solo &lt;lgl&gt;, oxygen_used &lt;lgl&gt;,
-## #   died &lt;lgl&gt;, death_cause &lt;chr&gt;, death_height_metres &lt;dbl&gt;, injured &lt;lgl&gt;,
-## #   injury_type &lt;chr&gt;, injury_height_metres &lt;dbl&gt;</code></pre>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(expedition_id) <span class="sc">%&gt;%</span> <span class="co"># groups rows by similar values in</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">average_age =</span> <span class="fu">mean</span>(age)) <span class="sc">%&gt;%</span> <span class="co"># create new column of average ages of each expedition group</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span> <span class="co"># drop NA here so I don&#39;t consider any groups that do not have a &quot;complete&quot; average age</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(members) <span class="ot">-&gt;</span> <span class="co"># combine average_age column into original data set</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  members_avg_age</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>expeditions <span class="sc">%&gt;%</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(termination_reason, expedition_id) <span class="ot">-&gt;</span> testing_tibble</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>expeditions <span class="sc">%&gt;%</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">termination_reason_01 =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(termination_reason, <span class="st">&quot;Success&quot;</span>),</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                                      <span class="dv">1</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>                                      <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(termination_reason, expedition_id) <span class="ot">-&gt;</span> probbbly_keeping_tibble</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>probbbly_keeping_tibble <span class="sc">%&gt;%</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(testing_tibble)</span></code></pre></div>
+<pre><code>## # A tibble: 0 x 2
+## # … with 2 variables: termination_reason &lt;chr&gt;, expedition_id &lt;chr&gt;</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># members %&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(expedition_id) %&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   distinct() %&gt;%</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   print()</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># expeditions %&gt;%</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(termination_reason = if_else((termination_reason == str_detect(&quot;Success&quot;)),</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#                                       1,</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#                                       0)) %&gt;%</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(termination_reason) %&gt;%</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   print(n = 100)</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co"># # members %&gt;%</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(expedition_id == &quot;AMAD61101&quot;) </span></span></code></pre></div>
 </div>
 <div id="answer" class="section level3">
 <h3>Answer</h3>

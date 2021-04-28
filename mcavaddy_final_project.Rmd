@@ -38,32 +38,52 @@ glimpse(peaks) # see data in peaks data set
 
 ## Question 1
 
-#### Is there a relationship between the average age of an expedition group and whether they successfully reached the peak?
+#### Is there a relationship between the average age of an expedition group and whether the group successfully reached a peak?
 
 ### Methods
 ```{r question_one_methods}
-# members %>%
-#   group_by(expedition_id) %>% # groups rows by similar values in 
-#   summarize(average_age = mean(age)) %>% # create new column of average ages of each expedition group
-#   drop_na() %>% # drop NA here so I don't consider any groups that do not have a "complete" average age
-#   left_join(members) %>% # combine average_age column into original data set 
-#   mutate(success = if_else(success == TRUE, 1, 0)) %>%
-#   select(expedition_id, average_age, success) %>%
-#   print()
+members %>%
+  group_by(expedition_id) %>% # groups rows by similar values in
+  summarize(average_age = mean(age)) %>% # create new column of average ages of each expedition group
+  drop_na() %>% # drop NA here so I don't consider any groups that do not have a "complete" average age
+  left_join(members) %>% # combine average_age column into original data set
+  mutate(success = if_else(success == TRUE, 1, 0)) %>% # change success column from logic to dbl for maths
+  select(expedition_id, average_age, success) %>% # I only want to see these columns
+  print()
+
+members %>%
+  group_by(expedition_id) %>% # groups rows by similar values in
+  summarize(average_age = mean(age)) %>% # create new column of average ages of each expedition group
+  drop_na() %>% # drop NA here so I don't consider any groups that do not have a "complete" average age
+  left_join(members) -> # combine average_age column into original data set
+  members_avg_age
+
+expeditions %>%
+  select(termination_reason, expedition_id) -> testing_tibble
+
+expeditions %>%
+  mutate(termination_reason_01 = if_else(str_detect(termination_reason, "Success"),
+                                      1,
+                                      0)) %>%
+  select(termination_reason, expedition_id) -> probbbly_keeping_tibble
+
+probbbly_keeping_tibble %>%
+  anti_join(testing_tibble)
 
 # members %>%
 #   select(expedition_id) %>%
 #   distinct() %>%
 #   print()
 
-expeditions %>%
-  mutate(termination_reason = str_replace(termination_reason, "Success (main peak) ", "Success")) %>%
-  mutate(termination_reason = str_replace(termination_reason, "Success (subpeak) ", "Success")) %>%
-  select(termination_reason) %>%
-  print(n = 100)
-
-members %>%
-  filter(expedition_id == "AMAD61101") 
+# expeditions %>%
+#   mutate(termination_reason = if_else((termination_reason == str_detect("Success")),
+#                                       1,
+#                                       0)) %>%
+#   select(termination_reason) %>%
+#   print(n = 100)
+# 
+# # members %>%
+#   filter(expedition_id == "AMAD61101") 
 
 
 ```
