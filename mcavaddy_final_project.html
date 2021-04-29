@@ -345,42 +345,39 @@ summary {
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>members <span class="sc">%&gt;%</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(expedition_id) <span class="sc">%&gt;%</span> <span class="co"># groups rows by similar values in</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">average_age =</span> <span class="fu">mean</span>(age)) <span class="sc">%&gt;%</span> <span class="co"># create new column of average ages of each expedition group</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(members) <span class="ot">-&gt;</span> <span class="co"># combine average_age column into original data set</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  members_avg_age</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># turn termination_reason column into &quot;success&quot; or &quot;failure&quot;</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>expeditions <span class="sc">%&gt;%</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">termination_reason_chr =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(termination_reason, <span class="st">&quot;Success&quot;</span>),</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">&quot;Success&quot;</span>,</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">&quot;Failure&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">termination_reason_01 =</span> <span class="fu">if_else</span>(termination_reason_chr <span class="sc">==</span> <span class="st">&quot;Success&quot;</span>,</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                                         <span class="dv">1</span>,</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                                         <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(termination_reason_01, termination_reason_chr, expedition_id) <span class="ot">-&gt;</span> </span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  expd_success_chr_01</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co"># bring together and clean tables with average ages and termination reasons</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>expd_success_chr_01 <span class="sc">%&gt;%</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(members_avg_age) <span class="sc">%&gt;%</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(expedition_id, average_age, termination_reason_chr, termination_reason_01) <span class="sc">%&gt;%</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="ot">-&gt;</span> expd_success_avg_age</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>expd_success_avg_age</span></code></pre></div>
-<pre><code>## # A tibble: 8,851 x 4
-##    expedition_id average_age termination_reason_chr termination_reason_01
-##    &lt;chr&gt;               &lt;dbl&gt; &lt;chr&gt;                                  &lt;dbl&gt;
-##  1 ANN273101            28.3 Success                                    1
-##  2 ANN278301            32.5 Failure                                    0
-##  3 ANN279301            29   Failure                                    0
-##  4 ANN280101            29.3 Failure                                    0
-##  5 ANN281302            37.7 Failure                                    0
-##  6 ANN281301            32.6 Failure                                    0
-##  7 ANN282301            31.8 Failure                                    0
-##  8 ANN283302            27.8 Failure                                    0
-##  9 ANN284101            34   Failure                                    0
-## 10 ANN284301            35   Failure                                    0
-## # … with 8,841 more rows</code></pre>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span> <span class="co"># drop NA here so I don&#39;t consider any groups that do not have a &quot;complete&quot; average age</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(members) <span class="ot">-&gt;</span> <span class="co"># combine average_age column into original data set</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  members_avg_age</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># turn termination_reason column into &quot;success&quot; or &quot;failure&quot;</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>expeditions <span class="sc">%&gt;%</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">termination_reason_chr =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(termination_reason, <span class="st">&quot;Success&quot;</span>),</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">&quot;Success&quot;</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">&quot;Failure&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">termination_reason_01 =</span> <span class="fu">if_else</span>(termination_reason_chr <span class="sc">==</span> <span class="st">&quot;Success&quot;</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                                         <span class="dv">1</span>,</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                                         <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(termination_reason_01, termination_reason_chr, expedition_id) <span class="ot">-&gt;</span> </span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  expd_success_chr_01</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co"># bring together and clean tables with average ages and termination reasons</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>expd_success_chr_01 <span class="sc">%&gt;%</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(members_avg_age) <span class="sc">%&gt;%</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(expedition_id, average_age, termination_reason_chr, termination_reason_01) <span class="sc">%&gt;%</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="ot">-&gt;</span> expd_success_avg_age</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check balance for ROC</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>expd_success_avg_age <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(termination_reason_chr)</span></code></pre></div>
+<pre><code>## # A tibble: 2 x 2
+##   termination_reason_chr     n
+## * &lt;chr&gt;                  &lt;int&gt;
+## 1 Failure                 3934
+## 2 Success                 4917</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># building a model using success as response and average age as predictor</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># age_model &lt;- glm(termination_reason_chr ~ average_age, data = expd_success_avg_age, family = &quot;binomial&quot;)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># tidy(age_model)</span></span></code></pre></div>
 </div>
 <div id="answer" class="section level3">
 <h3>Answer</h3>
@@ -418,8 +415,8 @@ summary {
 </div>
 <div id="question-4" class="section level2">
 <h2>Question 4</h2>
-<div id="which-peak-had-the-youngest-average-age-of-the-first-expedition-to-its-peak" class="section level4">
-<h4>Which peak had the youngest average age of the first expedition to its peak?</h4>
+<div id="which-peak-had-the-youngest-average-age-of-the-first-expedition-group-at-its-peak" class="section level4">
+<h4>Which peak had the youngest average age of the first expedition group at its peak?</h4>
 </div>
 <div id="methods-3" class="section level3">
 <h3>Methods</h3>

@@ -74,10 +74,14 @@ expd_success_chr_01 %>%
 ```
 
 ```{r question_one_model}
-# building a model using success as response and average age as predictor
-age_model <- glm(termination_reason_chr ~ average_age, data = expd_success_avg_age, family = "binomial")
+# check balance for ROC
+expd_success_avg_age %>%
+  count(termination_reason_chr)
 
-tidy(age_model)
+# building a model using success as response and average age as predictor
+# age_model <- glm(termination_reason_chr ~ average_age, data = expd_success_avg_age, family = "binomial")
+
+# tidy(age_model)
 
 
 ```
@@ -117,7 +121,7 @@ Replace this text with your answer to your question.
 
 ## Question 4
 
-#### Which peak had the youngest average age of the first expedition to its peak?
+#### Which peak had the youngest average age of the first expedition group at its peak?
 
 ### Methods
 
