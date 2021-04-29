@@ -16,6 +16,8 @@ knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo = TRUE, include = TRUE)
 
 # Load all libraries you use HERE:
 library(tidyverse)
+library(broom)
+library(pROC)
 ```
 
 <br><br>
@@ -38,19 +40,11 @@ glimpse(peaks) # see data in peaks data set
 
 ## Question 1
 
-#### Is there a relationship between the average age of an expedition group and whether the group successfully reached a peak?
+#### How well does the average age of an expedition group predict whether the group successfully reached a peak?
 
 ### Methods
-```{r question_one_methods}
-members %>%
-  group_by(expedition_id) %>% # groups rows by similar values in
-  summarize(average_age = mean(age)) %>% # create new column of average ages of each expedition group
-  drop_na() %>% # drop NA here so I don't consider any groups that do not have a "complete" average age
-  left_join(members) %>% # combine average_age column into original data set
-  mutate(success = if_else(success == TRUE, 1, 0)) %>% # change success column from logic to dbl for maths
-  select(expedition_id, average_age, success) %>% # I only want to see these columns
-  print()
-
+```{r question_one_wrangling}
+# create a column of expedition group's average age
 members %>%
   group_by(expedition_id) %>% # groups rows by similar values in
   summarize(average_age = mean(age)) %>% # create new column of average ages of each expedition group
@@ -58,34 +52,37 @@ members %>%
   left_join(members) -> # combine average_age column into original data set
   members_avg_age
 
+# turn termination_reason column into "success" or "failure"
 expeditions %>%
-  select(termination_reason, expedition_id) -> testing_tibble
+  mutate(termination_reason_chr = if_else(str_detect(termination_reason, "Success"),
+                                          "Success",
+                                          "Failure")) %>%
+  mutate(termination_reason_01 = if_else(termination_reason_chr == "Success",
+                                         1,
+                                         0)) %>%
+  select(termination_reason_01, termination_reason_chr, expedition_id) -> 
+  expd_success_chr_01
 
-expeditions %>%
-  mutate(termination_reason_01 = if_else(str_detect(termination_reason, "Success"),
-                                      1,
-                                      0)) %>%
-  select(termination_reason, expedition_id) -> probbbly_keeping_tibble
-
-probbbly_keeping_tibble %>%
-  anti_join(testing_tibble)
-
-# members %>%
-#   select(expedition_id) %>%
-#   distinct() %>%
-#   print()
-
-# expeditions %>%
-#   mutate(termination_reason = if_else((termination_reason == str_detect("Success")),
-#                                       1,
-#                                       0)) %>%
-#   select(termination_reason) %>%
-#   print(n = 100)
-# 
-# # members %>%
-#   filter(expedition_id == "AMAD61101") 
+# bring together and clean tables with average ages and termination reasons
+expd_success_chr_01 %>%
+  left_join(members_avg_age) %>%
+  select(expedition_id, average_age, termination_reason_chr, termination_reason_01) %>%
+  distinct() %>%
+  drop_na() -> expd_success_avg_age
 
 
+```
+
+```{r question_one_model}
+# building a model using success as response and average age as predictor
+age_model <- glm(termination_reason_chr ~ average_age, data = expd_success_avg_age, family = "binomial")
+
+tidy(age_model)
+
+
+```
+
+```{r question_one_plotting}
 ```
 ### Answer
 
@@ -120,7 +117,7 @@ Replace this text with your answer to your question.
 
 ## Question 4
 
-#### What is the minimum average age of a first ascent expedition group?
+#### Which peak had the youngest average age of the first expedition to its peak?
 
 ### Methods
 
