@@ -48,9 +48,8 @@ glimpse(peaks) # see data in peaks data set
 members %>%
   group_by(expedition_id) %>% # groups rows by similar values in
   summarize(average_age = mean(age)) %>% # create new column of average ages of each expedition group
-  drop_na() %>% # drop NA here so I don't consider any groups that do not have a "complete" average age
-  left_join(members) -> # combine average_age column into original data set
-  members_avg_age
+  drop_na()  -> members_avg_age # 
+  
 
 # turn termination_reason column into "success" or "failure"
 expeditions %>%
@@ -60,34 +59,36 @@ expeditions %>%
   mutate(termination_reason_01 = if_else(termination_reason_chr == "Success",
                                          1,
                                          0)) %>%
-  select(termination_reason_01, termination_reason_chr, expedition_id) -> 
-  expd_success_chr_01
+  select(termination_reason_01, termination_reason_chr, expedition_id) -> expd_success_chr_01
 
-# bring together and clean tables with average ages and termination reasons
-expd_success_chr_01 %>%
-  left_join(members_avg_age) %>%
-  select(expedition_id, average_age, termination_reason_chr, termination_reason_01) %>%
-  distinct() %>%
-  drop_na() -> expd_success_avg_age
-
-
+# combine table containing average_age with table containing termination_reason by expedition_id
+inner_join(members_avg_age, expd_success_chr_01) %>%
+  drop_na() -> expd_age_clean
 ```
 
 ```{r question_one_model}
 # check balance for ROC
-expd_success_avg_age %>%
+expd_age_clean %>%
   count(termination_reason_chr)
 
 # building a model using success as response and average age as predictor
-# age_model <- glm(termination_reason_chr ~ average_age, data = expd_success_avg_age, family = "binomial")
+age_model <- glm(termination_reason_01 ~ average_age, data = expd_age_clean, family = "binomial")
 
-# tidy(age_model)
-
-
+# create ROC curve for age_model
+roc(expd_age_clean$termination_reason_01, age_model$fitted.values) -> fitted_roc
 ```
 
 ```{r question_one_plotting}
+tibble(TPR = fitted_roc$sensitivities,
+       FPR = 1 - fitted_roc$specificities) %>%
+  ggplot() +
+  aes(x = FPR, y = TPR) +
+  labs(title = "ROC curve to classify climber success",
+       subtitle = paste("AUC = ",round(fitted_roc$auc, 3))) +
+  geom_line() +
+  geom_abline(col = "red")
 ```
+
 ### Answer
 
 Replace this text with your answer to your question.
@@ -121,7 +122,9 @@ Replace this text with your answer to your question.
 
 ## Question 4
 
-#### Which peak had the youngest average age of the first expedition group at its peak?
+#### Considering only the first expedition groups to arrive at a given peak, which peak experienced the youngest average aged climbers?
+
+Which peak had the youngest average age of the first expedition group at its peak?
 
 ### Methods
 
