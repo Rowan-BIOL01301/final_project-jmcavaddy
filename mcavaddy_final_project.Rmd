@@ -155,9 +155,28 @@ Injuries are more likely to occur in the upper half of the mountain.
 
 ### Methods
 ```{r question_three_wrangling}
+# finding total hikes per season
+expeditions %>%
+  count(season) %>%
+  rename(total_hikes = n) -> expeditions_seasons_total
 
+expeditions_seasons_total
+
+# calculating number of successes in each season and joining with total hike tibble
+expeditions %>%
+  select(termination_reason, season) %>%
+  drop_na() %>%
+  mutate(termination_reason_logic = if_else(str_detect(termination_reason, "Success"), # find expedition groups that succeeded
+                                          "Success", # replace their termination_reason with success
+                                          "Failure")) %>% # otherwise, replace termination_reason with failure
+  filter(season != "Unknown") %>% # get rid of unknown season rows
+  filter(termination_reason_logic == "Success") %>% # keep only the successes
+  count(season) %>% # count how many successes occurred in each season
+  rename(successful_hikes = n) %>% # rename n column for clarity
+  inner_join(expeditions_seasons_total) -> expeditions_seasons_success # join with tibble containing total number of hikes in each season
 ```
 ```{r question_three_plotting}
+
 ```
 ### Answer
 
