@@ -124,18 +124,28 @@ total_injuries <- injury_heights %>%
 injury_heights %>%
   count(injury_location) %>%
   group_by(injury_location) %>%
-  mutate(injury_rate = n / total_injuries) %>%
-  ungroup() %>%
-  print()
+  mutate(injury_rate = n / total_injuries$n) %>%
+  ungroup() -> injury_rates
 ```
 
 
 ```{r question_two_plotting}
+injury_rates %>%
+  ggplot() +
+  aes(x = "", y = injury_rate, fill = fct_relevel(injury_location, c("Upper", "Lower"))) + # specify plot aesthetic mappings
+  geom_col(color = "grey30") + # specify plot shape
+  scale_fill_manual(values = c("tomato1", "turquoise1"), name = "Injury location")  + # specify fill colors and legend title
+  coord_polar("y") + # map Y aesthetic (injury_rate, in this case) to the columns that will form the wedges (ie, which data do I want to be the wedges of the pie chart)
+  labs(title = "Rate of climber injuries in upper and lower halves of the mountain's height") +
+  geom_text(label = paste(injury_rates$injury_location, ": ", round(injury_rates$injury_rate, 4), # label specifications
+                          sep = ""), # remove unwanted spaces from labels
+            position = position_stack(vjust = 0.5)) + # places label at center of wedge/column
+  theme_void()
 ```
 
 ### Answer
 
-Replace this text with your answer to your question.
+Injuries are more likely to occur in the upper half of the mountain. 
 
 <br><br>
 
@@ -145,6 +155,7 @@ Replace this text with your answer to your question.
 
 ### Methods
 ```{r question_three_wrangling}
+
 ```
 ```{r question_three_plotting}
 ```
