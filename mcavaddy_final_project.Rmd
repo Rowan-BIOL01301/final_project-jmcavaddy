@@ -48,20 +48,20 @@ glimpse(peaks) # see data in peaks data set
 members %>%
   group_by(expedition_id) %>% # groups rows by similar values in
   summarize(average_age = mean(age)) %>% # create new column of average ages of each expedition group
-  drop_na()  -> members_avg_age # 
+  drop_na()  -> members_avg_age 
   
 
-# turn termination_reason column into "success" or "failure"
+# turn termination_reason column into "success" or "failure" and "1" or "0"
 expeditions %>%
-  mutate(termination_reason_chr = if_else(str_detect(termination_reason, "Success"),
-                                          "Success",
-                                          "Failure")) %>%
-  mutate(termination_reason_01 = if_else(termination_reason_chr == "Success",
-                                         1,
-                                         0)) %>%
+  mutate(termination_reason_chr = if_else(str_detect(termination_reason, "Success"), # find expedition groups that succeeded
+                                          "Success", # replace their termination_reason with success
+                                          "Failure")) %>% # otherwise, replace termination_reason with failure
+  mutate(termination_reason_01 = if_else(termination_reason_chr == "Success", # find expedition groups that succeeded
+                                         1,  # replace termination_reason with 1
+                                         0)) %>%  # otherwise, replace termination_reason with 0
   select(termination_reason_01, termination_reason_chr, expedition_id) -> expd_success_chr_01
 
-# combine table containing average_age with table containing termination_reason by expedition_id
+# combine table containing average_age with table containing termination_reason by expedition_id column
 inner_join(members_avg_age, expd_success_chr_01) %>%
   drop_na() -> expd_age_clean
 ```
@@ -79,19 +79,21 @@ roc(expd_age_clean$termination_reason_01, age_model$fitted.values) -> fitted_roc
 ```
 
 ```{r question_one_plotting}
-tibble(TPR = fitted_roc$sensitivities,
-       FPR = 1 - fitted_roc$specificities) %>%
-  ggplot() +
-  aes(x = FPR, y = TPR) +
-  labs(title = "ROC curve to classify climber success",
-       subtitle = paste("AUC = ",round(fitted_roc$auc, 3))) +
-  geom_line() +
-  geom_abline(col = "red")
+tibble(TPR = fitted_roc$sensitivities, # create column with true positive rate values
+       FPR = 1 - fitted_roc$specificities) %>% # create column with false positive rate values
+  ggplot() + 
+  aes(x = FPR, y = TPR) + # specify plot's aesthetic mappings
+  labs(title = "ROC curve to classify climber success", 
+       subtitle = paste("AUC = ",round(fitted_roc$auc, 3)),
+       y = "True positive rate",
+       x = "False positive rate") + # specify titles and labels
+  geom_line() + # create ROC curve
+  geom_abline(col = "red") # create diagonal line for ROC analysis
 ```
 
 ### Answer
 
-Replace this text with your answer to your question.
+An AUC of 0.525 suggests that age is a poor predictor of climber success. Individuals looking to climb in the Himalayas should not let age be their limiting factor!
 
 
 <br><br>
@@ -100,6 +102,36 @@ Replace this text with your answer to your question.
 
 #### Are injuries more likely to occur in the upper half or lower half of the peak's height?
 ### Methods
+```{r question_two_wrangling}
+# create column with half of peak height
+peaks %>%
+  mutate(half_height = height_metres / 2) %>%
+  select(peak_id, half_height, height_metres) -> peaks_halves
+
+# joining tables and creating upper/lower column
+inner_join(members, peaks_halves) %>%
+  select(peak_id, peak_name, half_height, height_metres, injury_height_metres) %>% # keep these columns
+  mutate(injury_location = if_else(injury_height_metres >= half_height, # if the injury occurred above the halfway height
+                                   "Upper", # injury location is "upper"
+                                   "Lower")) %>% # otherwise, injury location is "lower"
+  drop_na() -> injury_heights
+
+# create variable for total injuries for easy division later
+total_injuries <- injury_heights %>%
+  tally()
+  
+# figuring out rates of injuries in upper vs lower
+injury_heights %>%
+  count(injury_location) %>%
+  group_by(injury_location) %>%
+  mutate(injury_rate = n / total_injuries) %>%
+  ungroup() %>%
+  print()
+```
+
+
+```{r question_two_plotting}
+```
 
 ### Answer
 
@@ -109,10 +141,13 @@ Replace this text with your answer to your question.
 
 ## Question 3
 
-#### In which season are climbers most likely to succeed?
+#### In which season do climbers have the greatest chances of succeeding?
 
 ### Methods
-
+```{r question_three_wrangling}
+```
+```{r question_three_plotting}
+```
 ### Answer
 
 Replace this text with your answer to your question.
@@ -122,12 +157,15 @@ Replace this text with your answer to your question.
 
 ## Question 4
 
-#### Considering only the first expedition groups to arrive at a given peak, which peak experienced the youngest average aged climbers?
+#### Considering only the average ages of first expedition groups to arrive at a given peak, which peak was climbed by the youngest expedition group?
 
 Which peak had the youngest average age of the first expedition group at its peak?
 
 ### Methods
-
+```{r question_four_wrangling}
+```
+```{r question_four_plotting}
+```
 ### Answer
 
 Replace this text with your answer to your question.
