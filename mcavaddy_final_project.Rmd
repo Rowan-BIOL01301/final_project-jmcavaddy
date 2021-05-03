@@ -88,7 +88,9 @@ tibble(TPR = fitted_roc$sensitivities, # create column with true positive rate v
        y = "True positive rate",
        x = "False positive rate") + # specify titles and labels
   geom_line() + # create ROC curve
-  geom_abline(col = "red") # create diagonal line for ROC analysis
+  geom_abline(col = "red") + # create diagonal line for ROC analysis
+  theme_minimal()
+
 ```
 
 ### Answer
@@ -160,8 +162,6 @@ expeditions %>%
   count(season) %>%
   rename(total_hikes = n) -> expeditions_seasons_total
 
-expeditions_seasons_total
-
 # calculating number of successes in each season and joining with total hike tibble
 expeditions %>%
   select(termination_reason, season) %>%
@@ -174,13 +174,30 @@ expeditions %>%
   count(season) %>% # count how many successes occurred in each season
   rename(successful_hikes = n) %>% # rename n column for clarity
   inner_join(expeditions_seasons_total) -> expeditions_seasons_success # join with tibble containing total number of hikes in each season
-```
-```{r question_three_plotting}
 
+# calculating season success rates
+tibble(season = expeditions_seasons_success$season,
+      success_rate = expeditions_seasons_success$successful_hikes/expeditions_seasons_success$total_hikes) -> expeditions_success_rate
 ```
+
+```{r question_three_plotting}
+seasons_ordered <- c("Winter", "Spring", "Summer", "Autumn")
+
+expeditions_success_rate %>%
+  ggplot() +
+  aes(x = fct_relevel(season, seasons_ordered), y = success_rate, fill = seasons_ordered) +
+  labs(title = "Success rate of hikers in each season",
+       x = "Season", y = "Success rate") +
+  geom_col() +
+  scale_fill_manual(values = c("aquamarine", "lightgreen", "goldenrod1", "tomato")) +
+  geom_text(aes(label = paste(round((success_rate*100), 1), "%", sep = ""), y = success_rate + 0.012)) + 
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
 ### Answer
 
-Replace this text with your answer to your question.
+Hikers seem to succeed more often in the spring than other seasons. It is worth noting that spring and autumn have more data (n ~ 2000) than winter and summer (n ~ 200).
 
 
 <br><br>
