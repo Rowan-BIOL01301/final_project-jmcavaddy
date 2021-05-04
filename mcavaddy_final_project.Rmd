@@ -179,7 +179,6 @@ expeditions %>%
 tibble(season = expeditions_seasons_success$season,
       success_rate = expeditions_seasons_success$successful_hikes/expeditions_seasons_success$total_hikes) -> expeditions_success_rate
 ```
-
 ```{r question_three_plotting}
 seasons_ordered <- c("Winter", "Spring", "Summer", "Autumn")
 
@@ -204,15 +203,35 @@ Hikers seem to succeed more often in the spring than other seasons. It is worth 
 
 ## Question 4
 
-#### Considering only the average ages of first expedition groups to arrive at a given peak, which peak was climbed by the youngest expedition group?
+#### Considering only the average ages of first expedition groups, which mountain was ascended by the youngest expedition group?
 
 Which peak had the youngest average age of the first expedition group at its peak?
 
 ### Methods
 ```{r question_four_wrangling}
+peaks %>%
+  inner_join(members_avg_age, by = c("first_ascent_expedition_id" = "expedition_id")) %>% # combine tibbles with average age and group's average age
+  select(average_age, peak_name) %>% # keep only these columns
+  arrange(average_age) %>% # sort from least to greatest
+  slice_head(n = 5) -> youngest_peaks # take top 5 to visualize
 ```
 ```{r question_four_plotting}
+youngest_peaks %>%
+  ggplot() +
+  aes(x = fct_relevel(peak_name, c(peak_name)), y = average_age, fill = peak_name) + 
+  scale_fill_brewer(palette = "Set1") +
+  labs(title = "5 peaks first ascended by the youngest expedition groups",
+       x = "Peak name",
+       y = "Average age of expedition group") +
+  geom_col() +
+  theme_bw() + 
+  theme(legend.position = "none") + # remove legend
+  geom_text(aes(label = round(average_age, 2), # add labels to display average age
+                y = average_age + 0.02)) + # move the labels above the top of the column they represent
+  coord_cartesian(ylim = c(21, 22)) # zoom in between specified Y limits
+  
 ```
+
 ### Answer
 
-Replace this text with your answer to your question.
+Changla.
