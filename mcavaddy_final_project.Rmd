@@ -229,7 +229,6 @@ youngest_peaks %>%
   geom_text(aes(label = round(average_age, 2), # add labels to display average age
                 y = average_age + 0.02)) + # move the labels above the top of the column they represent
   coord_cartesian(ylim = c(21, 22)) # zoom in between specified Y limits
-  
 ```
 
 ### Answer
